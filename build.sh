@@ -36,10 +36,10 @@ do
 		echo "${i} version in our PPA: ${ourver}"
 		echo "${i} version in Obiaf's PPA: ${remotever}"
 		echo "building new version with turnip patches..."
-		build+=(${i})
+		build+=("${i}")
 	fi
 done
-rm -f /etc/apt/sources.list.d/mastag-ubuntu-*
+sudo rm -f /etc/apt/sources.list.d/mastag-ubuntu-*
 sudo apt update
 for i in "${build[@]}"
 	sudo apt build-dep -y ${i}
