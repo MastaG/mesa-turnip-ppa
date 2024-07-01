@@ -1,0 +1,34 @@
+# This is a basic workflow to help you get started with Actions
+
+name: turnip-ppa-update-24.04
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * *'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-24-04:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-24.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      
+      # Runs a set of commands using the runners shell
+      - name: Run build script for ubuntu 24.04
+        env:
+          EMAIL: ${{ secrets.EMAIL }}
+          PUBKEY: ${{ secrets.PUBKEY }}
+          PRIVKEY: ${{ secrets.PRIVKEY }}
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          chmod +x ./build.sh
+          ./build.sh
+
