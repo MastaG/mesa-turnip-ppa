@@ -42,6 +42,7 @@ done
 sudo rm -f /etc/apt/sources.list.d/mastag-ubuntu-*
 sudo apt update
 for i in "${build[@]}"
+do
 	sudo apt build-dep -y ${i}
 	rm -Rf ${i}*
 	apt source ${i}
