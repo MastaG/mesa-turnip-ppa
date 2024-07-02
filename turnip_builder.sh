@@ -42,22 +42,20 @@ run_all(){
 check_deps(){
 	echo "Checking system for required Dependencies ..."
 	for deps_chk in $deps;
-		do
-			sleep 0.25
-			if command -v "$deps_chk" >/dev/null 2>&1 ; then
-				echo -e "$green - $deps_chk found $nocolor"
-			else
-				echo -e "$red - $deps_chk not found, can't countinue. $nocolor"
-				deps_missing=1
-			fi;
-		done
+	do
+		sleep 0.25
+		if command -v "$deps_chk" >/dev/null 2>&1 ; then
+			echo -e "$green - $deps_chk found $nocolor"
+		else
+			echo -e "$red - $deps_chk not found, can't countinue. $nocolor"
+			deps_missing=1
+		fi;
+	done
 
-		if [ "$deps_missing" == "1" ]
-			then echo "Please install missing dependencies" && exit 1
-		fi
+	if [ "$deps_missing" == "1" ]
+		then echo "Please install missing dependencies" && exit 1
+	fi
 
-	echo "Installing python Mako dependency (if missing) ..." $'\n'
-	pip install mako &> /dev/null
 }
 
 prepare_workdir(){
