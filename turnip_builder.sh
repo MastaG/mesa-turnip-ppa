@@ -12,11 +12,11 @@ mesasrc="https://gitlab.freedesktop.org/mesa/mesa.git"
 
 #array of string => commit/branch;patch args
 patches=(
-	"fix-for-anon-file";../../turnip-patches/fix-for-anon-file.patch
-	"fix-for-getprogname";../../turnip-patches/fix-for-getprogname.patch
-	"fix-stringmapiterator";../../turnip-patches/fix-stringmapiterator.patch
-	"mesa-2934e1f-termux-x11-dri3";../../turnip-patches/mesa-2934e1f-termux-x11-dri3.patch
-	"zink_fixes";../../turnip-patches/zink_fixes.patch
+	"fix-for-anon-file;../../turnip-patches/fix-for-anon-file.patch;"
+	"fix-for-getprogname;../../turnip-patches/fix-for-getprogname.patch;"
+	"fix-stringmapiterator;../../turnip-patches/fix-stringmapiterator.patch;"
+	"mesa-2934e1f-termux-x11-dri3;../../turnip-patches/mesa-2934e1f-termux-x11-dri3.patch;"
+	"zink_fixes;../../turnip-patches/zink_fixes.patch;"
 )
 commit=""
 commit_short=""
