@@ -42,7 +42,7 @@ This repository takes care of two things:
   2. Add the following variables to ```/etc/environment```:
      ```
      MESA_LOADER_DRIVER_OVERRIDE=zink
-     K_ICD_FILENAMES=/usr/share/vulkan/icd.d/freedreno_icd.aarch64.json:/usr/share/vulkan/icd.d/freedreno_icd.armv7l.json
+     VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/freedreno_icd.aarch64.json:/usr/share/vulkan/icd.d/freedreno_icd.armv7l.json
      TU_DEBUG=noconform
      MESA_NO_ERROR=1
      ```
