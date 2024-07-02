@@ -17,6 +17,10 @@ patches=(
 	"fix-stringmapiterator;../../turnip-patches/fix-stringmapiterator.patch;"
 	"mesa-2934e1f-termux-x11-dri3;../../turnip-patches/mesa-2934e1f-termux-x11-dri3.patch;"
 	"zink_fixes;../../turnip-patches/zink_fixes.patch;"
+	"descr-prefetching-optimization-a7xx;merge_requests/29873;"
+	"make-gmem-work-with-preemption;merge_requests/29871;"
+	"VK_KHR_shader_clock;merge_requests/29860;"
+	"VK_EXT_fragment_density_map;merge_requests/29938;"
 )
 commit=""
 commit_short=""

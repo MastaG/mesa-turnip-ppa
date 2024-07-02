@@ -1,9 +1,9 @@
-name: Build "turnip"
+name: nightly-turnip-release
 
 on:
   workflow_dispatch:
   schedule:
-  - cron: "20 5 1,15 * *"
+  - cron: '30 2 * * *'
 
 jobs:
   start_building_turnip:
