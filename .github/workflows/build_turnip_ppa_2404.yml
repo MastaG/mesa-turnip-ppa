@@ -29,6 +29,6 @@ jobs:
           PRIVKEY: ${{ secrets.PRIVKEY }}
         run: |
           cd "$GITHUB_WORKSPACE"
-          chmod +x ./build.sh
-          ./build.sh
+          chmod +x ./build_ppa.sh
+          ./build_ppa.sh
 

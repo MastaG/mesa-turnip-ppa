@@ -7,6 +7,6 @@ ENV PUBKEY=$PUBKEY
 ENV PRIVKEY=$PRIVKEY
 ENV EMAIL=$EMAIL
 
-COPY ./build.sh /entrypoint.sh
+COPY ./build_ppa.sh /entrypoint.sh
 
 ENTRYPOINT [ "sh", "-c", "/entrypoint.sh" ]
