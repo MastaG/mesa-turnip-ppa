@@ -3,7 +3,7 @@
 
 This repository takes care of two things:
 
-- Re-building oibaf's graphics-drivers ppa (https://launchpad.net/~oibaf/+archive/ubuntu/graphics-drivers) with specific patches applied for the Turnip Vulkan driver.
+- Re-building oibaf's graphics-drivers ppa (nightly mesa from git) with extra patches applied.
 
   The patches are meant for running Ubuntu 24.04 (and 24.10 soon) within a proot environment using Termux on your Android device.
 
