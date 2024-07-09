@@ -15,7 +15,7 @@ This repository takes care of two things:
 
   1. Use this sample script to enter your proot distribution:
      ```
-     !/bin/sh
+     #!/bin/sh
 
      export XDG_RUNTIME_DIR=${TMPDIR}
 
