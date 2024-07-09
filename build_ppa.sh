@@ -3,7 +3,7 @@ patches=(
 	#"fix-for-anon-file;../../../turnip-patches/fix-for-anon-file.patch;"
 	#"fix-for-getprogname;../../../turnip-patches/fix-for-getprogname.patch;"
 	#"mesa-2934e1f-termux-x11-dri3;../../../turnip-patches/mesa-2934e1f-termux-x11-dri3.patch;"
-	#"zink_fixes;../../../turnip-patches/zink_fixes.patch;"
+	"zink_fixes;../../../turnip-patches/zink_fixes.patch;"
 	"04-wsi-termux-x11-only-kgsl;../../../turnip-patches/04-wsi-termux-x11-only-kgsl_fixed.patch;"
 	#"descr-prefetching-optimization-a7xx;merge_requests/29873;"
 	#"make-gmem-work-with-preemption;merge_requests/29871;"
