@@ -47,12 +47,10 @@ This repository takes care of two things:
      MESA_LOADER_DRIVER_OVERRIDE=zink
      VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/freedreno_icd.aarch64.json:/usr/share/vulkan/icd.d/freedreno_icd.armv7l.json
      TU_DEBUG=noconform
-     MESA_NO_ERROR=1
      ```
   3. Use this script to start xfce4:
      ```
      sudo /etc/init.d/dbus start
-     sudo chown -R root:root /tmp/.ICE-unix
      export DISPLAY=:0
      taskset -c 4-7 startxfce4
      ```
