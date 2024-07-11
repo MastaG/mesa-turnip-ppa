@@ -40,7 +40,8 @@ do
 		echo "${i} version in our PPA: ${ourver}"
 		echo "up-to-date with Obiaf's PPA :)"
 		echo "doing nothing..."
-		continue
+		#continue
+  		build+=("${i}")
 	else
 		echo "${i} version in our PPA: ${ourver}"
 		echo "${i} version in Obiaf's PPA: ${remotever}"
