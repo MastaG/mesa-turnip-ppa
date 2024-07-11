@@ -30,7 +30,7 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           sudo apt update
-          sudo apt install -y podman sudo
+          sudo apt install -y podman
           podman build -f Dockerfile -t turnip-build --build-arg EMAIL="$EMAIL" --build-arg PRIVKEY="$PRIVKEY" --build-arg PUBKEY="$PUBKEY"
           podman run turnip-build
 
