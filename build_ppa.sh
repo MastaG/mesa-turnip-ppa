@@ -90,7 +90,7 @@ do
 		done
 		cd ../..
 		# Enable kgsl
-		sed -i 's/GALLIUM_DRIVERS += freedreno$/GALLIUM_DRIVERS += freedreno\n\tconfflags_GALLIUM += -Dfreedreno-kmds=msm,kgsl/g' debian/rules
+		sed -i 's/GALLIUM_DRIVERS += freedreno$/GALLIUM_DRIVERS += freedreno\n\tconfflags_GALLIUM += -Dfreedreno-kmds=kgsl/g' debian/rules
 	else
 		dch --newversion "${newversion}" "Rebuild mesa-turnip-kgsl"
 		dch -r -u high "Rebuild mesa-turnip-kgsl"
