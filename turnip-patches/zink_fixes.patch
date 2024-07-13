@@ -1,0 +1,52 @@
+diff -ur mesa.orig/src/gallium/drivers/zink/zink_context.c mesa.mod/src/gallium/drivers/zink/zink_context.c
+--- mesa.orig/src/gallium/drivers/zink/zink_context.c	2024-05-22 23:40:44.418632421 +0800
++++ mesa.mod/src/gallium/drivers/zink/zink_context.c	2024-05-22 23:44:51.774632327 +0800
+@@ -448,7 +448,7 @@
+       sci.flags |= VK_SAMPLER_CREATE_NON_SEAMLESS_CUBE_MAP_BIT_EXT;
+    if (state->unnormalized_coords) {
+       assert(zink->flags & PIPE_CONTEXT_COMPUTE_ONLY);
+-      sci.unnormalizedCoordinates = state->unnormalized_coords;
++      //sci.unnormalizedCoordinates = state->unnormalized_coords;
+    }
+    sci.magFilter = zink_filter(state->mag_img_filter);
+    if (sci.unnormalizedCoordinates)
+diff -ur mesa.orig/src/gallium/drivers/zink/zink_screen.c mesa.mod/src/gallium/drivers/zink/zink_screen.c
+--- mesa.orig/src/gallium/drivers/zink/zink_screen.c	2024-05-22 23:40:44.422632421 +0800
++++ mesa.mod/src/gallium/drivers/zink/zink_screen.c	2024-05-22 23:42:43.774632375 +0800
+@@ -3297,12 +3297,12 @@
+ 
+    screen->instance_info.loader_version = zink_get_loader_version(screen);
+    if (config) {
+-      driParseConfigFiles(config->options, config->options_info, 0, "zink",
+-                          NULL, NULL, NULL, 0, NULL, 0);
+-      screen->driconf.dual_color_blend_by_location = driQueryOptionb(config->options, "dual_color_blend_by_location");
++      //driParseConfigFiles(config->options, config->options_info, 0, "zink",
++      //                    NULL, NULL, NULL, 0, NULL, 0);
++      //screen->driconf.dual_color_blend_by_location = driQueryOptionb(config->options, "dual_color_blend_by_location");
+       //screen->driconf.inline_uniforms = driQueryOptionb(config->options, "radeonsi_inline_uniforms");
+-      screen->driconf.emulate_point_smooth = driQueryOptionb(config->options, "zink_emulate_point_smooth");
+-      screen->driconf.zink_shader_object_enable = driQueryOptionb(config->options, "zink_shader_object_enable");
++      //screen->driconf.emulate_point_smooth = driQueryOptionb(config->options, "zink_emulate_point_smooth");
++      //screen->driconf.zink_shader_object_enable = driQueryOptionb(config->options, "zink_shader_object_enable");
+    }
+ 
+    if (!zink_create_instance(screen, dev_major > 0 && dev_major < 255))
+--- mesa.orig/src/mesa/main/context.c	2024-05-22 23:40:44.866632421 +0800
++++ mesa.mod/src/mesa/main/context.c	2024-05-22 23:43:50.414632350 +0800
+@@ -1483,14 +1483,14 @@
+       if (!check_compatible(newCtx, drawBuffer)) {
+          _mesa_warning(newCtx,
+               "MakeCurrent: incompatible visuals for context and drawbuffer");
+-         return GL_FALSE;
++         //return GL_FALSE;
+       }
+    }
+    if (newCtx && readBuffer && newCtx->WinSysReadBuffer != readBuffer) {
+       if (!check_compatible(newCtx, readBuffer)) {
+          _mesa_warning(newCtx,
+               "MakeCurrent: incompatible visuals for context and readbuffer");
+-         return GL_FALSE;
++         //return GL_FALSE;
+       }
+    }
+ 

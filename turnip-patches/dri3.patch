@@ -1,0 +1,330 @@
+diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
+index 1f7f07751c8..ddd0f1ad6a1 100644
+--- a/src/freedreno/vulkan/tu_shader.cc
++++ b/src/freedreno/vulkan/tu_shader.cc
+@@ -2124,10 +2124,10 @@ tu_upload_shader(struct tu_device *dev,
+       size += vpc_size;
+    }
+ 
+-   pthread_mutex_lock(&dev->pipeline_mutex);
++   mtx_lock(&dev->pipeline_mutex);
+    VkResult result = tu_suballoc_bo_alloc(&shader->bo, &dev->pipeline_suballoc,
+                                           size * 4, 128);
+-   pthread_mutex_unlock(&dev->pipeline_mutex);
++   mtx_unlock(&dev->pipeline_mutex);
+ 
+    if (result != VK_SUCCESS)
+       return result;
+@@ -2157,9 +2157,9 @@ tu_upload_shader(struct tu_device *dev,
+ 
+    result = tu_setup_pvtmem(dev, shader, &pvtmem_config, pvtmem_size, per_wave);
+    if (result != VK_SUCCESS) {
+-      pthread_mutex_lock(&dev->pipeline_mutex);
++      mtx_lock(&dev->pipeline_mutex);
+       tu_suballoc_bo_free(&dev->pipeline_suballoc, &shader->bo);
+-      pthread_mutex_unlock(&dev->pipeline_mutex);
++      mtx_unlock(&dev->pipeline_mutex);
+       return result;
+    }
+ 
+@@ -2853,10 +2853,10 @@ tu_empty_shader_create(struct tu_device *dev,
+    if (!shader)
+       return VK_ERROR_OUT_OF_HOST_MEMORY;
+ 
+-   pthread_mutex_lock(&dev->pipeline_mutex);
++   mtx_lock(&dev->pipeline_mutex);
+    VkResult result = tu_suballoc_bo_alloc(&shader->bo, &dev->pipeline_suballoc,
+                                           32 * 4, 128);
+-   pthread_mutex_unlock(&dev->pipeline_mutex);
++   mtx_unlock(&dev->pipeline_mutex);
+ 
+    if (result != VK_SUCCESS) {
+       vk_free(&dev->vk.alloc, shader);
+@@ -2968,9 +2968,9 @@ tu_shader_destroy(struct tu_device *dev,
+    tu_cs_finish(&shader->cs);
+    TU_RMV(resource_destroy, dev, &shader->bo);
+ 
+-   pthread_mutex_lock(&dev->pipeline_mutex);
++   mtx_lock(&dev->pipeline_mutex);
+    tu_suballoc_bo_free(&dev->pipeline_suballoc, &shader->bo);
+-   pthread_mutex_unlock(&dev->pipeline_mutex);
++   mtx_unlock(&dev->pipeline_mutex);
+ 
+    if (shader->pvtmem_bo)
+       tu_bo_finish(dev, shader->pvtmem_bo);
+diff --git a/src/freedreno/vulkan/tu_wsi.cc b/src/freedreno/vulkan/tu_wsi.cc
+index 1f3d7e2ecc4..9e8a65958f8 100644
+--- a/src/freedreno/vulkan/tu_wsi.cc
++++ b/src/freedreno/vulkan/tu_wsi.cc
+@@ -45,6 +45,10 @@ tu_wsi_init(struct tu_physical_device *physical_device)
+    if (result != VK_SUCCESS)
+       return result;
+ 
++   if (strcmp(physical_device->instance->knl->name, "kgsl") == 0) {
++      physical_device->wsi_device.is_tu_kgsl = true;
++   }
++
+    physical_device->wsi_device.supports_modifiers = true;
+    physical_device->wsi_device.can_present_on_device =
+       tu_wsi_can_present_on_device;
+diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
+index c06d4f7ffa2..b17df257dd4 100644
+--- a/src/vulkan/wsi/wsi_common.c
++++ b/src/vulkan/wsi/wsi_common.c
+@@ -1519,7 +1519,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
+ #endif
+       }
+ 
+-      if (wsi->sw)
++      if (wsi->sw || (wsi->is_tu_kgsl && !has_signal_dma_buf))
+ 	      wsi->WaitForFences(device, 1, &swapchain->fences[image_index],
+ 				 true, ~0ull);
+ 
+@@ -2157,7 +2157,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
+                         const struct wsi_cpu_image_params *params,
+                         struct wsi_image_info *info)
+ {
+-   assert(params->base.image_type == WSI_IMAGE_TYPE_CPU);
++   //assert(params->base.image_type == WSI_IMAGE_TYPE_CPU);
+    assert(chain->blit.type == WSI_SWAPCHAIN_NO_BLIT ||
+           chain->blit.type == WSI_SWAPCHAIN_BUFFER_BLIT);
+ 
+diff --git a/src/vulkan/wsi/wsi_common.h b/src/vulkan/wsi/wsi_common.h
+index 014cb718b17..a70a607c0a2 100644
+--- a/src/vulkan/wsi/wsi_common.h
++++ b/src/vulkan/wsi/wsi_common.h
+@@ -178,6 +178,7 @@ struct wsi_device {
+    } win32;
+ 
+    bool sw;
++   bool is_tu_kgsl;
+ 
+    /* Set to true if the implementation is ok with linear WSI images. */
+    bool wants_linear;
+diff --git a/src/vulkan/wsi/wsi_common_display.c b/src/vulkan/wsi/wsi_common_display.c
+index c91633e9bc4..0fb92efc173 100644
+--- a/src/vulkan/wsi/wsi_common_display.c
++++ b/src/vulkan/wsi/wsi_common_display.c
+@@ -176,6 +176,12 @@ struct wsi_display_sync {
+ 
+ static uint64_t fence_sequence;
+ 
++#ifdef __linux__
++static void thread_signal_handler (int signum) {
++   pthread_exit (0);
++}
++#endif
++
+ ICD_DEFINE_NONDISP_HANDLE_CASTS(wsi_display_mode, VkDisplayModeKHR)
+ ICD_DEFINE_NONDISP_HANDLE_CASTS(wsi_display_connector, VkDisplayKHR)
+ 
+@@ -1341,7 +1347,9 @@ wsi_display_wait_thread(void *data)
+       .events = POLLIN
+    };
+ 
++#ifndef __linux__
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+    for (;;) {
+       int ret = poll(&pollfd, 1, -1);
+       if (ret > 0) {
+@@ -1369,9 +1377,22 @@ wsi_display_start_wait_thread(struct wsi_display *wsi)
+ static void
+ wsi_display_stop_wait_thread(struct wsi_display *wsi)
+ {
++#ifdef __linux__
++   struct sigaction actions;
++   memset (&actions, 0, sizeof (actions));
++   sigemptyset (&actions.sa_mask);
++   actions.sa_flags = 0;
++   actions.sa_handler = thread_signal_handler;
++   sigaction (SIGUSR2, &actions, NULL);
++#endif
++
+    mtx_lock(&wsi->wait_mutex);
+    if (wsi->wait_thread) {
++#ifndef __linux__
+       pthread_cancel(wsi->wait_thread);
++#else
++      pthread_kill(wsi->wait_thread, SIGUSR2);
++#endif
+       pthread_join(wsi->wait_thread, NULL);
+       wsi->wait_thread = 0;
+    }
+@@ -2215,7 +2236,9 @@ udev_event_listener_thread(void *data)
+ 
+    int udev_fd = udev_monitor_get_fd(mon);
+ 
++#ifndef __linux__
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ 
+    for (;;) {
+       nfds_t nfds = 1;
+@@ -2340,6 +2363,15 @@ wsi_display_finish_wsi(struct wsi_device *wsi_device,
+    struct wsi_display *wsi =
+       (struct wsi_display *) wsi_device->wsi[VK_ICD_WSI_PLATFORM_DISPLAY];
+ 
++#ifdef __linux__
++   struct sigaction actions;
++   memset (&actions, 0, sizeof (actions));
++   sigemptyset (&actions.sa_mask);
++   actions.sa_flags = 0;
++   actions.sa_handler = thread_signal_handler;
++   sigaction (SIGUSR2, &actions, NULL);
++#endif
++
+    if (wsi) {
+       wsi_for_each_connector(connector, wsi) {
+          wsi_for_each_display_mode(mode, connector) {
+@@ -2351,7 +2383,11 @@ wsi_display_finish_wsi(struct wsi_device *wsi_device,
+       wsi_display_stop_wait_thread(wsi);
+ 
+       if (wsi->hotplug_thread) {
++#ifndef __linux__
+          pthread_cancel(wsi->hotplug_thread);
++#else
++         pthread_kill(wsi->hotplug_thread, SIGUSR2);
++#endif
+          pthread_join(wsi->hotplug_thread, NULL);
+       }
+ 
+diff --git a/src/vulkan/wsi/wsi_common_drm.c b/src/vulkan/wsi/wsi_common_drm.c
+index 63995c6d208..6b26542dccc 100644
+--- a/src/vulkan/wsi/wsi_common_drm.c
++++ b/src/vulkan/wsi/wsi_common_drm.c
+@@ -45,6 +45,9 @@
+ static VkResult
+ wsi_dma_buf_export_sync_file(int dma_buf_fd, int *sync_file_fd)
+ {
++   #if defined (__linux__)
++      return VK_ERROR_FEATURE_NOT_PRESENT;
++   #else
+    /* Don't keep trying an IOCTL that doesn't exist. */
+    static bool no_dma_buf_sync_file = false;
+    if (no_dma_buf_sync_file)
+@@ -68,11 +71,15 @@ wsi_dma_buf_export_sync_file(int dma_buf_fd, int *sync_file_fd)
+    *sync_file_fd = export.fd;
+ 
+    return VK_SUCCESS;
++   #endif
+ }
+ 
+ static VkResult
+ wsi_dma_buf_import_sync_file(int dma_buf_fd, int sync_file_fd)
+ {
++   #if defined (__linux__)
++      return VK_ERROR_FEATURE_NOT_PRESENT;
++   #else
+    /* Don't keep trying an IOCTL that doesn't exist. */
+    static bool no_dma_buf_sync_file = false;
+    if (no_dma_buf_sync_file)
+@@ -94,6 +101,7 @@ wsi_dma_buf_import_sync_file(int dma_buf_fd, int sync_file_fd)
+    }
+ 
+    return VK_SUCCESS;
++   #endif
+ }
+ 
+ static VkResult
+diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
+index f6a9b8d33e4..92d386ebd05 100644
+--- a/src/vulkan/wsi/wsi_common_x11.c
++++ b/src/vulkan/wsi/wsi_common_x11.c
+@@ -147,22 +147,7 @@ static bool
+ wsi_x11_check_dri3_compatible(const struct wsi_device *wsi_dev,
+                               xcb_connection_t *conn)
+ {
+-   xcb_screen_iterator_t screen_iter =
+-      xcb_setup_roots_iterator(xcb_get_setup(conn));
+-   xcb_screen_t *screen = screen_iter.data;
+-
+-   /* Open the DRI3 device from the X server. If we do not retrieve one we
+-    * assume our local device is compatible.
+-    */
+-   int dri3_fd = wsi_dri3_open(conn, screen->root, None);
+-   if (dri3_fd == -1)
+-      return true;
+-
+-   bool match = wsi_device_matches_drm_fd(wsi_dev, dri3_fd);
+-
+-   close(dri3_fd);
+-
+-   return match;
++   return true;
+ }
+ 
+ static bool
+@@ -1396,7 +1381,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
+       options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
+ #endif
+ 
+-   xshmfence_reset(image->shm_fence);
+ 
+    if (!chain->base.image_info.explicit_sync) {
+       ++chain->sent_image_count;
+@@ -1748,9 +1732,6 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
+       return result;
+ 
+    assert(*image_index < chain->base.image_count);
+-   if (chain->images[*image_index].shm_fence &&
+-       !chain->base.image_info.explicit_sync)
+-      xshmfence_await(chain->images[*image_index].shm_fence);
+ 
+    return result;
+ }
+@@ -2115,15 +2096,24 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+       if (fd == -1)
+          return VK_ERROR_OUT_OF_HOST_MEMORY;
+ 
+-      cookie =
+-         xcb_dri3_pixmap_from_buffer_checked(chain->conn,
+-                                             image->pixmap,
+-                                             chain->window,
+-                                             image->base.sizes[0],
+-                                             pCreateInfo->imageExtent.width,
+-                                             pCreateInfo->imageExtent.height,
+-                                             image->base.row_pitches[0],
+-                                             chain->depth, bpp, fd);
++      cookie = xcb_dri3_pixmap_from_buffers_checked(chain->conn,
++                                                    image->pixmap,
++                                                    chain->window,
++                                                    image->base.num_planes,
++                                                    pCreateInfo->imageExtent.width,
++                                                    pCreateInfo->imageExtent.height,
++                                                    image->base.row_pitches[0],
++                                                    image->base.offsets[0],
++                                                    0,
++                                                    0,
++                                                    0,
++                                                    0,
++                                                    0,
++                                                    0,
++                                                    chain->depth,
++                                                    bpp,
++                                                    1274,
++                                                    &fd);
+    }
+ 
+    error = xcb_request_check(chain->conn, cookie);
+@@ -2153,6 +2143,9 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+    }
+ #endif
+ 
++   image->sync_fence = 0;
++   return VK_SUCCESS;
++
+ out_fence:
+    fence_fd = xshmfence_alloc_shm();
+    if (fence_fd < 0)
+@@ -2194,10 +2187,6 @@ x11_image_finish(struct x11_swapchain *chain,
+    xcb_void_cookie_t cookie;
+ 
+    if (!chain->base.wsi->sw || chain->has_mit_shm) {
+-      cookie = xcb_sync_destroy_fence(chain->conn, image->sync_fence);
+-      xcb_discard_reply(chain->conn, cookie.sequence);
+-      xshmfence_unmap_shm(image->shm_fence);
+-
+       cookie = xcb_free_pixmap(chain->conn, image->pixmap);
+       xcb_discard_reply(chain->conn, cookie.sequence);
+ 
