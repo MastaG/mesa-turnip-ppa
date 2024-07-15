@@ -5,7 +5,7 @@ This repository takes care of two things:
 
 - Re-building oibaf's graphics-drivers ppa (nightly mesa from git) with extra patches applied.
 
-  The patches are meant for running Ubuntu 24.04 (and 24.10 soon) within a proot environment using Termux on your Android device.
+  The patches are meant for running Ubuntu 24.04 and 24.10 within a proot environment using Termux on your Android device.
 
   This should allow for accelated Vulkan and OpenGL (using Zink).
 
