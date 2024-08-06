@@ -21,6 +21,8 @@ install_dev() {
 	fi
 }
 sudo apt update
+sudo apt -y upgrade
+sudo apt -y full-upgrade
 sudo apt install -y software-properties-common git
 echo "${PUBKEY}" | base64 --decode | gpg --batch --import
 echo "${PRIVKEY}" | base64 --decode | gpg --batch --import
