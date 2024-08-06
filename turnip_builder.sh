@@ -12,10 +12,10 @@ mesasrc="https://gitlab.freedesktop.org/mesa/mesa.git"
 
 #array of string => commit/branch;patch args
 patches=(
-	"fix-for-anon-file;../../turnip-patches/fix-for-anon-file.patch;"
-	"fix-for-getprogname;../../turnip-patches/fix-for-getprogname.patch;"
-	"zink_fixes;../../turnip-patches/zink_fixes.patch;"
-	"dri3;../../turnip-patches/dri3.patch;"
+	#"fix-for-anon-file;../../turnip-patches/fix-for-anon-file.patch;"
+	#"fix-for-getprogname;../../turnip-patches/fix-for-getprogname.patch;"
+	#"zink_fixes;../../turnip-patches/zink_fixes.patch;"
+	#"dri3;../../turnip-patches/dri3.patch;"
 	#"descr-prefetching-optimization-a7xx;merge_requests/29873;"
 	#"make-gmem-work-with-preemption;merge_requests/29871;"
 	#"VK_EXT_fragment_density_map;merge_requests/29938;"
