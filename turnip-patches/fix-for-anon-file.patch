@@ -1,8 +1,8 @@
-Fallback to `/tmp` if env `XDG_RUNTIME_DIR` is not set.
-
+diff --git a/src/util/anon_file.c b/src/util/anon_file.c
+index bc674c4b66f..1a52b3fa7c1 100644
 --- a/src/util/anon_file.c
 +++ b/src/util/anon_file.c
-@@ -136,6 +136,11 @@
+@@ -137,6 +137,11 @@ os_create_anonymous_file(int64_t size, const char *debug_name)
     char *name;
  
     path = getenv("XDG_RUNTIME_DIR");

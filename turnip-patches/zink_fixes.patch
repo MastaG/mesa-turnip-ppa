@@ -1,7 +1,8 @@
-diff -ur mesa.orig/src/gallium/drivers/zink/zink_context.c mesa.mod/src/gallium/drivers/zink/zink_context.c
---- mesa.orig/src/gallium/drivers/zink/zink_context.c	2024-05-22 23:40:44.418632421 +0800
-+++ mesa.mod/src/gallium/drivers/zink/zink_context.c	2024-05-22 23:44:51.774632327 +0800
-@@ -448,7 +448,7 @@
+diff --git a/src/gallium/drivers/zink/zink_context.c b/src/gallium/drivers/zink/zink_context.c
+index a2322ec28ca..cb96fbab5bc 100644
+--- a/src/gallium/drivers/zink/zink_context.c
++++ b/src/gallium/drivers/zink/zink_context.c
+@@ -448,7 +448,7 @@ zink_create_sampler_state(struct pipe_context *pctx,
        sci.flags |= VK_SAMPLER_CREATE_NON_SEAMLESS_CUBE_MAP_BIT_EXT;
     if (state->unnormalized_coords) {
        assert(zink->flags & PIPE_CONTEXT_COMPUTE_ONLY);
@@ -10,10 +11,11 @@ diff -ur mesa.orig/src/gallium/drivers/zink/zink_context.c mesa.mod/src/gallium/
     }
     sci.magFilter = zink_filter(state->mag_img_filter);
     if (sci.unnormalizedCoordinates)
-diff -ur mesa.orig/src/gallium/drivers/zink/zink_screen.c mesa.mod/src/gallium/drivers/zink/zink_screen.c
---- mesa.orig/src/gallium/drivers/zink/zink_screen.c	2024-05-22 23:40:44.422632421 +0800
-+++ mesa.mod/src/gallium/drivers/zink/zink_screen.c	2024-05-22 23:42:43.774632375 +0800
-@@ -3297,12 +3297,12 @@
+diff --git a/src/gallium/drivers/zink/zink_screen.c b/src/gallium/drivers/zink/zink_screen.c
+index 8337573829a..eaa91ebfe9f 100644
+--- a/src/gallium/drivers/zink/zink_screen.c
++++ b/src/gallium/drivers/zink/zink_screen.c
+@@ -3323,12 +3323,12 @@ zink_internal_create_screen(const struct pipe_screen_config *config, int64_t dev
  
     screen->instance_info.loader_version = zink_get_loader_version(screen);
     if (config) {
@@ -30,10 +32,12 @@ diff -ur mesa.orig/src/gallium/drivers/zink/zink_screen.c mesa.mod/src/gallium/d
 +      //screen->driconf.zink_shader_object_enable = driQueryOptionb(config->options, "zink_shader_object_enable");
     }
  
-    if (!zink_create_instance(screen, dev_major > 0 && dev_major < 255))
---- mesa.orig/src/mesa/main/context.c	2024-05-22 23:40:44.866632421 +0800
-+++ mesa.mod/src/mesa/main/context.c	2024-05-22 23:43:50.414632350 +0800
-@@ -1483,14 +1483,14 @@
+    if (!zink_create_instance(screen))
+diff --git a/src/mesa/main/context.c b/src/mesa/main/context.c
+index cbe8b4c0914..7b5b4505a85 100644
+--- a/src/mesa/main/context.c
++++ b/src/mesa/main/context.c
+@@ -1483,14 +1483,14 @@ _mesa_make_current( struct gl_context *newCtx,
        if (!check_compatible(newCtx, drawBuffer)) {
           _mesa_warning(newCtx,
                "MakeCurrent: incompatible visuals for context and drawbuffer");

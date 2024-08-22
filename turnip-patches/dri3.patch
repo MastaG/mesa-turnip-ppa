@@ -1,8 +1,8 @@
 diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
-index 1f7f07751c8..ddd0f1ad6a1 100644
+index 44f4e5f62ef..1ad32f2cdba 100644
 --- a/src/freedreno/vulkan/tu_shader.cc
 +++ b/src/freedreno/vulkan/tu_shader.cc
-@@ -2124,10 +2124,10 @@ tu_upload_shader(struct tu_device *dev,
+@@ -2110,10 +2110,10 @@ tu_upload_shader(struct tu_device *dev,
        size += vpc_size;
     }
  
@@ -15,7 +15,7 @@ index 1f7f07751c8..ddd0f1ad6a1 100644
  
     if (result != VK_SUCCESS)
        return result;
-@@ -2157,9 +2157,9 @@ tu_upload_shader(struct tu_device *dev,
+@@ -2143,9 +2143,9 @@ tu_upload_shader(struct tu_device *dev,
  
     result = tu_setup_pvtmem(dev, shader, &pvtmem_config, pvtmem_size, per_wave);
     if (result != VK_SUCCESS) {
@@ -27,7 +27,7 @@ index 1f7f07751c8..ddd0f1ad6a1 100644
        return result;
     }
  
-@@ -2853,10 +2853,10 @@ tu_empty_shader_create(struct tu_device *dev,
+@@ -2841,10 +2841,10 @@ tu_empty_shader_create(struct tu_device *dev,
     if (!shader)
        return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -40,7 +40,7 @@ index 1f7f07751c8..ddd0f1ad6a1 100644
  
     if (result != VK_SUCCESS) {
        vk_free(&dev->vk.alloc, shader);
-@@ -2968,9 +2968,9 @@ tu_shader_destroy(struct tu_device *dev,
+@@ -2956,9 +2956,9 @@ tu_shader_destroy(struct tu_device *dev,
     tu_cs_finish(&shader->cs);
     TU_RMV(resource_destroy, dev, &shader->bo);
  
@@ -53,10 +53,10 @@ index 1f7f07751c8..ddd0f1ad6a1 100644
     if (shader->pvtmem_bo)
        tu_bo_finish(dev, shader->pvtmem_bo);
 diff --git a/src/freedreno/vulkan/tu_wsi.cc b/src/freedreno/vulkan/tu_wsi.cc
-index 1f3d7e2ecc4..9e8a65958f8 100644
+index 57cf9048b07..4b397e741cf 100644
 --- a/src/freedreno/vulkan/tu_wsi.cc
 +++ b/src/freedreno/vulkan/tu_wsi.cc
-@@ -45,6 +45,10 @@ tu_wsi_init(struct tu_physical_device *physical_device)
+@@ -48,6 +48,10 @@ tu_wsi_init(struct tu_physical_device *physical_device)
     if (result != VK_SUCCESS)
        return result;
  
@@ -68,10 +68,10 @@ index 1f3d7e2ecc4..9e8a65958f8 100644
     physical_device->wsi_device.can_present_on_device =
        tu_wsi_can_present_on_device;
 diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
-index c06d4f7ffa2..b17df257dd4 100644
+index 898bdd7bcdb..83d1feb59b8 100644
 --- a/src/vulkan/wsi/wsi_common.c
 +++ b/src/vulkan/wsi/wsi_common.c
-@@ -1519,7 +1519,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
+@@ -1543,7 +1543,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
  #endif
        }
  
@@ -80,7 +80,7 @@ index c06d4f7ffa2..b17df257dd4 100644
  	      wsi->WaitForFences(device, 1, &swapchain->fences[image_index],
  				 true, ~0ull);
  
-@@ -2157,7 +2157,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
+@@ -2181,7 +2181,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
                          const struct wsi_cpu_image_params *params,
                          struct wsi_image_info *info)
  {
@@ -102,7 +102,7 @@ index 014cb718b17..a70a607c0a2 100644
     /* Set to true if the implementation is ok with linear WSI images. */
     bool wants_linear;
 diff --git a/src/vulkan/wsi/wsi_common_display.c b/src/vulkan/wsi/wsi_common_display.c
-index c91633e9bc4..0fb92efc173 100644
+index f2049101a3f..f2e76ddf37b 100644
 --- a/src/vulkan/wsi/wsi_common_display.c
 +++ b/src/vulkan/wsi/wsi_common_display.c
 @@ -176,6 +176,12 @@ struct wsi_display_sync {
@@ -190,7 +190,7 @@ index c91633e9bc4..0fb92efc173 100644
        }
  
 diff --git a/src/vulkan/wsi/wsi_common_drm.c b/src/vulkan/wsi/wsi_common_drm.c
-index 63995c6d208..6b26542dccc 100644
+index 9835f8f990b..ba73f679cf9 100644
 --- a/src/vulkan/wsi/wsi_common_drm.c
 +++ b/src/vulkan/wsi/wsi_common_drm.c
 @@ -45,6 +45,9 @@
@@ -228,10 +228,10 @@ index 63995c6d208..6b26542dccc 100644
  
  static VkResult
 diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
-index f6a9b8d33e4..92d386ebd05 100644
+index 0c0c489d893..a0b15205779 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
-@@ -147,22 +147,7 @@ static bool
+@@ -149,21 +149,6 @@ static bool
  wsi_x11_check_dri3_compatible(const struct wsi_device *wsi_dev,
                                xcb_connection_t *conn)
  {
@@ -246,16 +246,14 @@ index f6a9b8d33e4..92d386ebd05 100644
 -   if (dri3_fd == -1)
 -      return true;
 -
--   bool match = wsi_device_matches_drm_fd(wsi_dev, dri3_fd);
+-   bool match = wsi_dev->can_present_on_device(wsi_dev->pdevice, dri3_fd);
 -
 -   close(dri3_fd);
 -
--   return match;
-+   return true;
+    return match;
  }
  
- static bool
-@@ -1396,7 +1381,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
+@@ -1402,7 +1387,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
        options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
  #endif
  
@@ -263,7 +261,7 @@ index f6a9b8d33e4..92d386ebd05 100644
  
     if (!chain->base.image_info.explicit_sync) {
        ++chain->sent_image_count;
-@@ -1748,9 +1732,6 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
+@@ -1771,9 +1755,6 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
        return result;
  
     assert(*image_index < chain->base.image_count);
@@ -273,7 +271,7 @@ index f6a9b8d33e4..92d386ebd05 100644
  
     return result;
  }
-@@ -2115,15 +2096,24 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+@@ -2139,15 +2120,24 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
        if (fd == -1)
           return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -307,7 +305,7 @@ index f6a9b8d33e4..92d386ebd05 100644
     }
  
     error = xcb_request_check(chain->conn, cookie);
-@@ -2153,6 +2143,9 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+@@ -2177,6 +2167,9 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
     }
  #endif
  
@@ -317,7 +315,7 @@ index f6a9b8d33e4..92d386ebd05 100644
  out_fence:
     fence_fd = xshmfence_alloc_shm();
     if (fence_fd < 0)
-@@ -2194,10 +2187,6 @@ x11_image_finish(struct x11_swapchain *chain,
+@@ -2218,10 +2211,6 @@ x11_image_finish(struct x11_swapchain *chain,
     xcb_void_cookie_t cookie;
  
     if (!chain->base.wsi->sw || chain->has_mit_shm) {
