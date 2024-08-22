@@ -228,10 +228,10 @@ index 9835f8f990b..ba73f679cf9 100644
  
  static VkResult
 diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
-index 0c0c489d893..a0b15205779 100644
+index 0c0c489d893..41eb565d0d1 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
-@@ -149,21 +149,6 @@ static bool
+@@ -149,22 +149,7 @@ static bool
  wsi_x11_check_dri3_compatible(const struct wsi_device *wsi_dev,
                                xcb_connection_t *conn)
  {
@@ -250,9 +250,11 @@ index 0c0c489d893..a0b15205779 100644
 -
 -   close(dri3_fd);
 -
-    return match;
+-   return match;
++   return true;
  }
  
+ static bool
 @@ -1402,7 +1387,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
        options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
  #endif
