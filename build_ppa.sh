@@ -37,6 +37,7 @@ for i in {libdrm,mesa}
 do
 	if [ "${i}" == "mesa" ]
 	then
+		continue
 		package="mesa-vulkan-drivers"
 	elif [ "${i}" == "libdrm" ]
 	then
