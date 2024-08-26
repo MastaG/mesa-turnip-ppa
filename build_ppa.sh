@@ -40,7 +40,6 @@ do
 		package="mesa-vulkan-drivers"
 	elif [ "${i}" == "libdrm" ]
 	then
-		continue
 		package="libdrm2"
 	fi
 	remotever="$(apt-cache policy ${package} | grep -B1 "oibaf/graphics-drivers/ubuntu" | head -1 | sed -En 's/.* (.*git.*) .*/\1/p')"
@@ -50,7 +49,6 @@ do
 		echo "${i} version in our PPA: ${ourver}"
 		echo "up-to-date with Obiaf's PPA :)"
 		echo "doing nothing..."
-		build+=("${i}")
 		continue
 	else
 		echo "${i} version in our PPA: ${ourver}"
