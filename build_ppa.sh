@@ -37,10 +37,10 @@ for i in {libdrm,mesa}
 do
 	if [ "${i}" == "mesa" ]
 	then
-		continue
 		package="mesa-vulkan-drivers"
 	elif [ "${i}" == "libdrm" ]
 	then
+		continue
 		package="libdrm2"
 	fi
 	remotever="$(apt-cache policy ${package} | grep -B1 "oibaf/graphics-drivers/ubuntu" | head -1 | sed -En 's/.* (.*git.*) .*/\1/p')"
