@@ -231,7 +231,7 @@ diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
 index 0c0c489d893..41eb565d0d1 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
-@@ -148,22 +148,7 @@ static bool
+@@ -147,23 +147,8 @@ static bool
  wsi_x11_check_dri3_compatible(const struct wsi_device *wsi_dev,
                                xcb_connection_t *conn)
  {
@@ -253,28 +253,29 @@ index 0c0c489d893..41eb565d0d1 100644
 -   return match;
 +   return true;
  }
- 
- static bool
-@@ -1403,7 +1388,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
-       options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
  #endif
+
+ static bool
+@@ -1403,6 +1388,5 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
+       options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
  
 -   xshmfence_reset(image->shm_fence);
  
     if (!chain->base.image_info.explicit_sync) {
        ++chain->sent_image_count;
-@@ -1775,9 +1761,6 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
+@@ -1775,12 +1759,9 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
        return result;
- 
+
     assert(*image_index < chain->base.image_count);
--   #ifdef HAVE_X11_DRM
+ #ifdef HAVE_X11_DRM
 -   if (chain->images[*image_index].shm_fence &&
 -       !chain->base.image_info.explicit_sync)
 -      xshmfence_await(chain->images[*image_index].shm_fence);
--   #endif
- 
+ #endif
+
     return result;
  }
+
 @@ -2142,15 +2123,24 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
        if (fd == -1)
           return VK_ERROR_OUT_OF_HOST_MEMORY;
@@ -319,16 +320,15 @@ index 0c0c489d893..41eb565d0d1 100644
  out_fence:
     fence_fd = xshmfence_alloc_shm();
     if (fence_fd < 0)
-@@ -2223,10 +2218,6 @@ x11_image_finish(struct x11_swapchain *chain,
+@@ -2223,7 +2218,4 @@ x11_image_finish(struct x11_swapchain *chain,
     xcb_void_cookie_t cookie;
- 
     if (!chain->base.wsi->sw || chain->has_mit_shm) {
--#ifdef HAVE_X11_DRM
+ #ifdef HAVE_X11_DRM
 -      cookie = xcb_sync_destroy_fence(chain->conn, image->sync_fence);
 -      xcb_discard_reply(chain->conn, cookie.sequence);
 -      xshmfence_unmap_shm(image->shm_fence);
--#endif
-
+ #endif
+   #endif
        cookie = xcb_free_pixmap(chain->conn, image->pixmap);
        xcb_discard_reply(chain->conn, cookie.sequence);
  
