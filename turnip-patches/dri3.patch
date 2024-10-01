@@ -2,7 +2,7 @@ diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.
 index 44f4e5f62ef..1ad32f2cdba 100644
 --- a/src/freedreno/vulkan/tu_shader.cc
 +++ b/src/freedreno/vulkan/tu_shader.cc
-@@ -2110,10 +2110,10 @@ tu_upload_shader(struct tu_device *dev,
+@@ -2112,10 +2112,10 @@ tu_upload_shader(struct tu_device *dev,
        size += vpc_size;
     }
  
@@ -15,7 +15,7 @@ index 44f4e5f62ef..1ad32f2cdba 100644
  
     if (result != VK_SUCCESS)
        return result;
-@@ -2143,9 +2143,9 @@ tu_upload_shader(struct tu_device *dev,
+@@ -2145,9 +2145,9 @@ tu_upload_shader(struct tu_device *dev,
  
     result = tu_setup_pvtmem(dev, shader, &pvtmem_config, pvtmem_size, per_wave);
     if (result != VK_SUCCESS) {
@@ -27,7 +27,7 @@ index 44f4e5f62ef..1ad32f2cdba 100644
        return result;
     }
  
-@@ -2841,10 +2841,10 @@ tu_empty_shader_create(struct tu_device *dev,
+@@ -2845,10 +2845,10 @@ tu_empty_shader_create(struct tu_device *dev,
     if (!shader)
        return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -40,7 +40,7 @@ index 44f4e5f62ef..1ad32f2cdba 100644
  
     if (result != VK_SUCCESS) {
        vk_free(&dev->vk.alloc, shader);
-@@ -2956,9 +2956,9 @@ tu_shader_destroy(struct tu_device *dev,
+@@ -2960,9 +2960,9 @@ tu_shader_destroy(struct tu_device *dev,
     tu_cs_finish(&shader->cs);
     TU_RMV(resource_destroy, dev, &shader->bo);
  
@@ -71,7 +71,7 @@ diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
 index 898bdd7bcdb..83d1feb59b8 100644
 --- a/src/vulkan/wsi/wsi_common.c
 +++ b/src/vulkan/wsi/wsi_common.c
-@@ -1543,7 +1543,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
+@@ -1552,7 +1552,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
  #endif
        }
  
@@ -80,7 +80,7 @@ index 898bdd7bcdb..83d1feb59b8 100644
  	      wsi->WaitForFences(device, 1, &swapchain->fences[image_index],
  				 true, ~0ull);
  
-@@ -2181,7 +2181,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
+@@ -2190,7 +2190,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
                          const struct wsi_cpu_image_params *params,
                          struct wsi_image_info *info)
  {
@@ -231,7 +231,7 @@ diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
 index 0c0c489d893..41eb565d0d1 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
-@@ -149,22 +149,7 @@ static bool
+@@ -148,22 +148,7 @@ static bool
  wsi_x11_check_dri3_compatible(const struct wsi_device *wsi_dev,
                                xcb_connection_t *conn)
  {
@@ -255,7 +255,7 @@ index 0c0c489d893..41eb565d0d1 100644
  }
  
  static bool
-@@ -1402,7 +1387,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
+@@ -1403,7 +1388,6 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
        options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
  #endif
  
@@ -263,17 +263,19 @@ index 0c0c489d893..41eb565d0d1 100644
  
     if (!chain->base.image_info.explicit_sync) {
        ++chain->sent_image_count;
-@@ -1771,9 +1755,6 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
+@@ -1775,9 +1761,6 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
        return result;
  
     assert(*image_index < chain->base.image_count);
+-   #ifdef HAVE_X11_DRM
 -   if (chain->images[*image_index].shm_fence &&
 -       !chain->base.image_info.explicit_sync)
 -      xshmfence_await(chain->images[*image_index].shm_fence);
+-   #endif
  
     return result;
  }
-@@ -2139,15 +2120,24 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+@@ -2142,15 +2123,24 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
        if (fd == -1)
           return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -307,7 +309,7 @@ index 0c0c489d893..41eb565d0d1 100644
     }
  
     error = xcb_request_check(chain->conn, cookie);
-@@ -2177,6 +2167,9 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+@@ -2180,6 +2170,9 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
     }
  #endif
  
@@ -317,14 +319,16 @@ index 0c0c489d893..41eb565d0d1 100644
  out_fence:
     fence_fd = xshmfence_alloc_shm();
     if (fence_fd < 0)
-@@ -2218,10 +2211,6 @@ x11_image_finish(struct x11_swapchain *chain,
+@@ -2223,10 +2218,6 @@ x11_image_finish(struct x11_swapchain *chain,
     xcb_void_cookie_t cookie;
  
     if (!chain->base.wsi->sw || chain->has_mit_shm) {
+-#ifdef HAVE_X11_DRM
 -      cookie = xcb_sync_destroy_fence(chain->conn, image->sync_fence);
 -      xcb_discard_reply(chain->conn, cookie.sequence);
 -      xshmfence_unmap_shm(image->shm_fence);
--
+-#endif
+
        cookie = xcb_free_pixmap(chain->conn, image->pixmap);
        xcb_discard_reply(chain->conn, cookie.sequence);
  
