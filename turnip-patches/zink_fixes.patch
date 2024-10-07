@@ -1,5 +1,5 @@
 diff --git a/src/gallium/drivers/zink/zink_context.c b/src/gallium/drivers/zink/zink_context.c
-index a2322ec28ca..cb96fbab5bc 100644
+index 2b9f5b37a57..6a55e56ad5b 100644
 --- a/src/gallium/drivers/zink/zink_context.c
 +++ b/src/gallium/drivers/zink/zink_context.c
 @@ -448,7 +448,7 @@ zink_create_sampler_state(struct pipe_context *pctx,
@@ -12,10 +12,10 @@ index a2322ec28ca..cb96fbab5bc 100644
     sci.magFilter = zink_filter(state->mag_img_filter);
     if (sci.unnormalizedCoordinates)
 diff --git a/src/gallium/drivers/zink/zink_screen.c b/src/gallium/drivers/zink/zink_screen.c
-index 8337573829a..eaa91ebfe9f 100644
+index 74708395bb3..18fd2b764a0 100644
 --- a/src/gallium/drivers/zink/zink_screen.c
 +++ b/src/gallium/drivers/zink/zink_screen.c
-@@ -3323,12 +3323,12 @@ zink_internal_create_screen(const struct pipe_screen_config *config, int64_t dev
+@@ -3331,12 +3331,12 @@ zink_internal_create_screen(const struct pipe_screen_config *config, int64_t dev
  
     screen->instance_info.loader_version = zink_get_loader_version(screen);
     if (config) {
