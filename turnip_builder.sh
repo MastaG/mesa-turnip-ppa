@@ -8,7 +8,8 @@ workdir="$(pwd)/turnip_workdir"
 packagedir="$workdir/turnip_module"
 ndkver="android-ndk-r26c"
 sdkver="31"
-mesasrc="https://gitlab.freedesktop.org/mesa/mesa.git"
+mesasrc="https://gitlab.freedesktop.org/Valentine/mesa"
+mesabranch="tandroid"
 
 #array of string => commit/branch;patch args
 patches=(
@@ -83,7 +84,7 @@ prepare_workdir(){
 		fi
 		
 		echo "Cloning mesa ..." $'\n'
-		git clone --depth=1 "$mesasrc"  &> /dev/null
+		git clone --depth=1 -b $mesabranch "$mesasrc" &> /dev/null
 
 		cd mesa
 		commit_short=$(git rev-parse --short HEAD)

@@ -1,8 +1,23 @@
+From f393ba877481c3986cba8aeae0b4c4b6bcc65a1f Mon Sep 17 00:00:00 2001
+From: MastaG <mastag@gmail.com>
+Date: Mon, 25 Nov 2024 09:59:53 +0100
+Subject: [PATCH] Rebase DRI3 patch
+
+---
+ src/freedreno/vulkan/tu_shader.cc   | 16 ++++----
+ src/freedreno/vulkan/tu_wsi.cc      |  4 ++
+ src/vulkan/wsi/wsi_common.c         |  4 +-
+ src/vulkan/wsi/wsi_common.h         |  1 +
+ src/vulkan/wsi/wsi_common_display.c | 36 ++++++++++++++++++
+ src/vulkan/wsi/wsi_common_drm.c     |  8 ++++
+ src/vulkan/wsi/wsi_common_x11.c     | 59 +++++++++++------------------
+ 7 files changed, 81 insertions(+), 47 deletions(-)
+
 diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
-index 199d7478fd3..fc011650926 100644
+index 037ba321480..c52a18e7070 100644
 --- a/src/freedreno/vulkan/tu_shader.cc
 +++ b/src/freedreno/vulkan/tu_shader.cc
-@@ -2112,10 +2112,10 @@ tu_upload_shader(struct tu_device *dev,
+@@ -2170,10 +2170,10 @@ tu_upload_shader(struct tu_device *dev,
        size += vpc_size;
     }
  
@@ -15,7 +30,7 @@ index 199d7478fd3..fc011650926 100644
  
     if (result != VK_SUCCESS)
        return result;
-@@ -2145,9 +2145,9 @@ tu_upload_shader(struct tu_device *dev,
+@@ -2203,9 +2203,9 @@ tu_upload_shader(struct tu_device *dev,
  
     result = tu_setup_pvtmem(dev, shader, &pvtmem_config, pvtmem_size, per_wave);
     if (result != VK_SUCCESS) {
@@ -27,7 +42,7 @@ index 199d7478fd3..fc011650926 100644
        return result;
     }
  
-@@ -2855,10 +2855,10 @@ tu_empty_shader_create(struct tu_device *dev,
+@@ -2934,10 +2934,10 @@ tu_empty_shader_create(struct tu_device *dev,
     if (!shader)
        return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -40,7 +55,7 @@ index 199d7478fd3..fc011650926 100644
  
     if (result != VK_SUCCESS) {
        vk_free(&dev->vk.alloc, shader);
-@@ -2970,9 +2970,9 @@ tu_shader_destroy(struct tu_device *dev,
+@@ -3049,9 +3049,9 @@ tu_shader_destroy(struct tu_device *dev,
     tu_cs_finish(&shader->cs);
     TU_RMV(resource_destroy, dev, &shader->bo);
  
@@ -68,10 +83,10 @@ index 57cf9048b07..4b397e741cf 100644
     physical_device->wsi_device.can_present_on_device =
        tu_wsi_can_present_on_device;
 diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
-index cd63a008c05..c40344449dd 100644
+index 548bbc8c930..1e28e8883de 100644
 --- a/src/vulkan/wsi/wsi_common.c
 +++ b/src/vulkan/wsi/wsi_common.c
-@@ -1552,7 +1552,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
+@@ -1554,7 +1554,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
  #endif
        }
  
@@ -80,7 +95,7 @@ index cd63a008c05..c40344449dd 100644
  	      wsi->WaitForFences(device, 1, &swapchain->fences[image_index],
  				 true, ~0ull);
  
-@@ -2190,7 +2190,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
+@@ -2192,7 +2192,7 @@ wsi_configure_cpu_image(const struct wsi_swapchain *chain,
                          const struct wsi_cpu_image_params *params,
                          struct wsi_image_info *info)
  {
@@ -90,7 +105,7 @@ index cd63a008c05..c40344449dd 100644
            chain->blit.type == WSI_SWAPCHAIN_BUFFER_BLIT);
  
 diff --git a/src/vulkan/wsi/wsi_common.h b/src/vulkan/wsi/wsi_common.h
-index eebf519e6bc..805d427617e 100644
+index fee70909b70..64e16c3c3c6 100644
 --- a/src/vulkan/wsi/wsi_common.h
 +++ b/src/vulkan/wsi/wsi_common.h
 @@ -178,6 +178,7 @@ struct wsi_device {
@@ -332,3 +347,6 @@ index 03980b8d583..66e82988a47 100644
        cookie = xcb_free_pixmap(chain->conn, image->pixmap);
        xcb_discard_reply(chain->conn, cookie.sequence);
  #ifdef HAVE_X11_DRM
+-- 
+2.47.0
+
