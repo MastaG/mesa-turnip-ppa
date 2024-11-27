@@ -8,8 +8,8 @@ workdir="$(pwd)/turnip_workdir"
 packagedir="$workdir/turnip_module"
 ndkver="android-ndk-r26c"
 sdkver="31"
-mesasrc="https://gitlab.freedesktop.org/Valentine/mesa.git"
-mesabranch="tandroid"
+mesasrc="https://gitlab.freedesktop.org/mesa/mesa.git"
+mesabranch="main"
 
 #array of string => commit/branch;patch args
 patches=(
