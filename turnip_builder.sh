@@ -198,8 +198,8 @@ EOF
 		echo "Turnip - $mesa_version - $date" > release
 		echo "$mesa_version"_"$commit_short" > tag
 		echo  $filename > filename
-		echo "### Repository: $mesasrc, Branch: $mesabranch" > description
-		echo "### Base commit : [$commit_short]($patchurl/commit/$commit_short)" > description
+		echo "### Repository : $mesasrc, Branch : $mesabranch" > description
+		echo "### Base commit : [$commit_short]($patchurl/commit/$commit_short)" >> description
 		echo "false" > patched
 	else		
 		if [ $1 == "patched" ]; then 
