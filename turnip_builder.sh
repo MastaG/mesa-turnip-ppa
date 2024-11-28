@@ -6,10 +6,11 @@ nocolor='\033[0m'
 deps="meson ninja patchelf unzip curl pip flex bison zip git"
 workdir="$(pwd)/turnip_workdir"
 packagedir="$workdir/turnip_module"
-ndkver="android-ndk-r26c"
-sdkver="31"
+ndkver="android-ndk-r27c"
+sdkver="33"
 mesasrc="https://gitlab.freedesktop.org/mesa/mesa.git"
 mesabranch="main"
+patchurl="$(echo $mesasrc |  sed 's/\.git$/\/-/g')"
 
 #array of string => commit/branch;patch args
 patches=(
@@ -107,8 +108,8 @@ prepare_workdir(){
 					sleep 1
 				else 
 					patch_file="${patch_source#*\/}"
-					patch_args=$(echo $patch | cut -d ";" -f 3 | xargs)
-					curl --output "$patch_file".patch -k --retry-delay 30 --retry 5 -f --retry-all-errors https://gitlab.freedesktop.org/mesa/mesa/-/"$patch_source".patch
+					patch_args="$(echo $patch | cut -d ";" -f 3 | xargs)"
+					curl --output "$patch_file".patch -k --retry-delay 30 --retry 5 -f --retry-all-errors "$patchurl"/"$patch_source".patch
 					sleep 1
 				
 					git apply $patch_args "$patch_file".patch
@@ -155,9 +156,9 @@ port_lib_for_adrenotool(){
 	cp "$workdir"/mesa/build-android-aarch64/src/freedreno/vulkan/libvulkan_freedreno.so "$workdir"
 	cd "$workdir"
 	patchelf --set-soname vulkan.adreno.so libvulkan_freedreno.so
-	mv libvulkan_freedreno.so vulkan.ad07XX.so
+	mv libvulkan_freedreno.so vulkan.adreno.so
 
-	if ! [ -a vulkan.ad07XX.so ]; then
+	if ! [ -a vulkan.adreno.so ]; then
 		echo -e "$red Build failed! $nocolor" && exit 1
 	fi
 
@@ -174,19 +175,19 @@ port_lib_for_adrenotool(){
 {
   "schemaVersion": 1,
   "name": "Turnip - $date - $commit_short$suffix",
-  "description": "Compiled from Mesa, Commit $commit_short$suffix",
+  "description": "Compiled from Mesa: $mesasrc, Branch: $mesabranch, Commit $commit_short$suffix",
   "author": "mesa",
   "packageVersion": "1",
   "vendor": "Mesa",
   "driverVersion": "$mesa_version/vk$vulkan_version",
   "minApi": 27,
-  "libraryName": "vulkan.ad07XX.so"
+  "libraryName": "vulkan.adreno.so"
 }
 EOF
 
 	filename=turnip_"$(date +'%b-%d-%Y')"_"$commit_short"
 	echo "Copy necessary files from work directory ..." $'\n'
-	cp "$workdir"/vulkan.ad07XX.so "$packagedir"
+	cp "$workdir"/vulkan.adreno.so "$packagedir"
 
 	echo "Packing files in to adrenotool package ..." $'\n'
 	zip -9 "$workdir"/"$filename$suffix".zip ./*
@@ -197,7 +198,8 @@ EOF
 		echo "Turnip - $mesa_version - $date" > release
 		echo "$mesa_version"_"$commit_short" > tag
 		echo  $filename > filename
-		echo "### Base commit : [$commit_short](https://gitlab.freedesktop.org/mesa/mesa/-/commit/$commit_short)" > description
+		echo "### Repository: $mesasrc, Branch: $mesabranch" > description
+		echo "### Base commit : [$commit_short]($patchurl/commit/$commit_short)" > description
 		echo "false" > patched
 	else		
 		if [ $1 == "patched" ]; then 
@@ -211,7 +213,7 @@ EOF
 				if [[ $patch_source == *"../.."* ]]; then
 					echo "- $patch_name, $patch_source, $patch_args" >> description
 				else 
-					echo "- $patch_name, [$patch_source](https://gitlab.freedesktop.org/mesa/mesa/-/$patch_source), $patch_args" >> description
+					echo "- $patch_name, [$patch_source]($patchurl/$patch_source), $patch_args" >> description
 				fi
 			done
 			echo "true" > patched
