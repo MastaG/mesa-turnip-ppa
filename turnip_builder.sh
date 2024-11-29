@@ -21,6 +21,9 @@ patches=(
 	#"descr-prefetching-optimization-a7xx;merge_requests/29873;"
 	#"make-gmem-work-with-preemption;merge_requests/29871;"
 	#"VK_EXT_fragment_density_map;merge_requests/29938;"
+	"Minor-misc-Android-improvements;merge_requests/32317;"
+	"Refactor-the-submit-path;merge_requests/32165;"
+	"ir3-fix-a-hang;merge_requests/32140;"
 )
 commit=""
 commit_short=""
