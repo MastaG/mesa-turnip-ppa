@@ -1,3 +1,9 @@
+NOTE: I don't gave time to keep updating and rebasing the DRI3 patches.
+The PPA has therefore been failing for a long time.
+Also due to this the last succesfull build is probably broken as well.
+Please do not open bug reports.
+
+I might pick this up later in the future.
 
 ![Schermafdruk_2024-07-02_09-42-26](https://github.com/MastaG/mesa-turnip-ppa/assets/15012115/84b6d427-c780-45a2-85bf-cf8b84d6fa56)
 
